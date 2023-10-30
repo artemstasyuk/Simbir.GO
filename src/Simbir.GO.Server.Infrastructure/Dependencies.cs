@@ -1,9 +1,17 @@
-﻿using Simbir.GO.Server.Infrastructure.Persistence.Database;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Simbir.GO.Server.Infrastructure.Persistence.Database;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using Simbir.GO.Server.ApplicationCore.Interfaces;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Authentication;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Helpers;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Persistence;
+using Simbir.GO.Server.Infrastructure.Auth;
+using Simbir.GO.Server.Infrastructure.Helpers;
 using Simbir.GO.Server.Infrastructure.Persistence;
 
 namespace Simbir.GO.Server.Infrastructure;
@@ -14,12 +22,43 @@ public static class Dependencies
         IHostBuilder host)
     {
         services
+            .AddAuth(configuration)
             .AddPersistence()
             .AddLogging(configuration, host);
         
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddHttpContextAccessor();
+        services.AddScoped<IUserContext, UserContext>();
+        
+        
         return services;
     }
+    
+    private static IServiceCollection AddAuth(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var jwtSettings = new JwtSettings();
+        configuration.Bind(JwtSettings.SectionName, jwtSettings);
 
+        services.AddSingleton(Options.Create(jwtSettings));
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(jwtSettings.Secret))
+            });
+
+        return services;
+    }
+    
     private static IServiceCollection AddPersistence(this IServiceCollection services)
     {
         services.AddPostgres();

@@ -1,46 +1,62 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Simbir.GO.Server.Domain.Enums;
+using Simbir.GO.Server.ApplicationCore.Contracts.Admin.Accounts;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Admin;
+using Simbir.GO.Server.ApplicationCore.Specifications.Accounts;
 
 namespace Simbir.GO.Server.API.Controllers.Admin;
 
 [ApiController]
-[Route("api/v{version:apiVersion}/admin/account")]
+[Route("api/Admin/Account")]
 [Authorize(Roles = "Admin")]
 public class AdminAccountController: ControllerBase
 {
-    /*GET /api/Admin/Account
-        описание: Получение списка всех аккаунтов
-    параметры:
-    start: int //Начало выборки
-        count: int //Размер выборки
-        ограничения: Только администраторы
-    GET /api/Admin/Account/{id}
-    описание: Получение информации об аккаунте по id
-    ограничения: Только администраторы
-    POST /api/Admin/Account
-        описание: Создание администратором нового аккаунта
-    body:
+    private readonly IAdminAccountService _adminAccountService;
+
+    public AdminAccountController(IAdminAccountService adminAccountService)
     {
-        "username": "string", //имя пользователя
-        "password": "string", //пароль
-        "isAdmin": bool, //является ли пользователь администратором
-        "balance": double //баланс пользователя
+        _adminAccountService = adminAccountService;
     }
-    ограничения: Только администраторы, нельзя создать аккаунт с уже существующим в
-    системе username
-    PUT /api/Admin/Account/{id}
-    описание: Изменение администратором аккаунта по id
-        body:
+    
+    
+    [HttpGet]
+    public async Task<IActionResult> Get ([FromQuery] AccountFilter filter)
     {
-        "username": "string", //имя пользователя
-        "password": "string", //пароль
-        "isAdmin": bool, //является ли пользователь администратором
-        "balance": double //баланс пользователя
+        filter ??= new AccountFilter();
+        var accounts = await _adminAccountService.GetByFiltersAsync(filter);
+        return Ok(accounts);
     }
-    ограничения: Только администраторы, нельзя изменять username на уже
-    существующий в системе
-        DELETE /api/Admin/Account/{id}
-    описание: Удаление аккаунта по id
-    ограничения: Только администраторы*/
+    
+    
+    [HttpGet("{id:long}")]
+    public async Task<IActionResult> GetById ([FromRoute] long id)
+    {
+        var account = await _adminAccountService.GetByIdAsync(id);
+        return Ok(account);
+    }
+    
+    
+    [HttpPost]
+    public async Task<IActionResult> Create ([FromBody] AdminCreateAccountRequest request)
+    {
+        var account = await _adminAccountService.CreateAsync(request);
+        return Ok(account);
+    }
+    
+    
+    [HttpPut("{id:long}")]
+    public async Task<IActionResult> Update ([FromRoute] long id, [FromBody] AdminUpdateAccountRequest request)
+    {
+        var account = await _adminAccountService.UpdateAsync(id, request);
+        return Ok(account);
+    }
+    
+    
+    [HttpDelete("{id:long}")]
+    public async Task<IActionResult> Delete ([FromRoute] long id)
+    {
+        await _adminAccountService.DeleteAsync(id);
+        return Ok();
+    }
+    
 }

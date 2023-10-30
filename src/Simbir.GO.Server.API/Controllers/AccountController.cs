@@ -1,45 +1,70 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Simbir.GO.Server.Contracts.Auth;
+using Simbir.GO.Server.ApplicationCore.Contracts.Accounts;
+using Simbir.GO.Server.ApplicationCore.Contracts.Authentication;
+using Simbir.GO.Server.ApplicationCore.Interfaces;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Authentication;
+
 
 namespace Simbir.GO.Server.API.Controllers;
 
 [ApiController]
-[Route("api/v{version:apiVersion}/account")]
-[AllowAnonymous]
+[Route("api/Account")]
 public class AccountController: ControllerBase
 {
-    [HttpPost("sign-out")]
-    public async Task<IActionResult> Register([FromForm] RegisterRequest request)
+
+    private readonly IAccountService _accountService;
+    private readonly IAuthenticationService _authenticationService;
+
+    public AccountController(IAccountService accountService, IAuthenticationService authenticationService)
     {
-        return null;
+        _accountService = accountService;
+        _authenticationService = authenticationService;
     }
 
-    [HttpPost("sign-in")]
-    public async Task<IActionResult> Login([FromForm] LoginRequest request)
+    [HttpPost("SignUp")]
+    [AllowAnonymous]
+    public async Task<IActionResult> SignUp([FromForm] SignUpRequest request)
     {
-        return null;
+        var result = await _authenticationService.SignUpAsync(request);
+        return Ok(result);
     }
 
-    [HttpPost("sign-out")]
-    public async Task<IActionResult> SignOut()
+    
+    [HttpPost("SignIn")]
+    [AllowAnonymous]
+    public async Task<IActionResult> SignIn([FromForm] SignInRequest request)
     {
-        return null;
-    }
-
-
-    [Authorize]
-    [HttpGet("me")]
-    public async Task<IActionResult> Me()
-    {
-        return null;
+        var result = await _authenticationService.SignInAsync(request);
+        return Ok(result);
     }
     
+    
+    [HttpPost("SignOut")]
     [Authorize]
-    [HttpPut("update")]
-    public async Task<IActionResult> Update()
+    public async Task<IActionResult> SignOut()
     {
-        return null;
+        //TODO implement distruction refresh token logic 
+        await _authenticationService.SignOutAsync();
+        return Ok();
+    }
+    
+    
+    [HttpGet("Me")]
+    [Authorize]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        var result = await _authenticationService.GetCurrentUserAsync();
+        return Ok(result);
+    }
+    
+    
+    [HttpPut("Update")]
+    [Authorize]
+    public async Task<IActionResult> Update(EditAccountRequest request)
+    {
+        var result = await _accountService.EditAsync(request);
+        return Ok(result);
     }
 }
     

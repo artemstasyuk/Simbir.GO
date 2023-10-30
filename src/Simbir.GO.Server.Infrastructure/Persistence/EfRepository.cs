@@ -1,12 +1,13 @@
 ﻿using Ardalis.Specification.EntityFrameworkCore;
-using Simbir.GO.Server.ApplicationCore.Interfaces;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Persistence;
 
 namespace Simbir.GO.Server.Infrastructure.Persistence;
 
-public class EfRepository<T>: RepositoryBase<T>, IRepository<T> where T : class
+public class EfRepository<T> : RepositoryBase<T>, IRepository<T> where T : class
 {
+    
     private readonly AppDbContext _dbContext;
-
+    
     public EfRepository(AppDbContext dbContext) : base(dbContext)
         => _dbContext = dbContext;
 

@@ -1,14 +1,30 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Simbir.GO.Server.ApplicationCore.Interfaces;
 
 namespace Simbir.GO.Server.API.Controllers;
 
 
 [ApiController]
-[Route("api/v{version:apiVersion}/checkout")]
+[Route("api/Payment")]
 public class PaymentController : ControllerBase
 {
-    /*POST /api/Payment/Hesoyam/{accountId}
-    описание: Добавляет на баланс аккаунта с id={accountId} 250 000 денежных единиц.
-        ограничения: Администратор может добавить баланс всем, обычный пользователь
-    только себе*/
+    private readonly IPaymentService _paymentService;
+
+    public PaymentController(IPaymentService paymentService)
+    {
+        _paymentService = paymentService;
+    }
+
+    [HttpPost("Hesoyam/{accountId:long}")]
+    [Authorize]
+    public async Task<IActionResult> AddBalance([FromRoute] long accountId)
+    {
+        if (User.IsInRole("Admin"))
+             await _paymentService.UpdateBalanceAsync(accountId);
+
+        await _paymentService.AddBalance();
+
+        return Ok();
+    }
 }

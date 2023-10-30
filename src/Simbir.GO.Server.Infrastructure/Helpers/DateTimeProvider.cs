@@ -1,4 +1,4 @@
-using Simbir.GO.Server.ApplicationCore.Interfaces;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Helpers;
 
 namespace Simbir.GO.Server.Infrastructure.Helpers;
 

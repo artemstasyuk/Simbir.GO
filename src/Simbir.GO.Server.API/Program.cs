@@ -7,9 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services
-    .AddPresentation()
     .AddApplicationCore()
-    .AddInfrastructure(builder.Configuration, builder.Host);
+    .AddInfrastructure(builder.Configuration, builder.Host)
+    .AddPresentation();
 
 
 var app = builder.Build();
@@ -21,7 +21,7 @@ if (app.Environment.IsDevelopment())
         .AllowAnyMethod()
         .AllowAnyHeader()
         .SetIsOriginAllowed(origin => true) // allow any origin
-        .AllowCredentials()); // 
+        .AllowCredentials());
     
     app.UseExceptionHandler("/error"); 
     app.UseSwagger();

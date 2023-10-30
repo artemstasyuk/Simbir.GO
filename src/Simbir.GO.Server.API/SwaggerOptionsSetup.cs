@@ -21,8 +21,8 @@ public class SwaggerOptionsSetup : IConfigureOptions<SwaggerGenOptions>
                 new OpenApiInfo
                 {
                     Version = apiVersion,
-                    Title = $"iRenta API {apiVersion}",
-                    Description = "ASP NET Core Web API for iRenta"
+                    Title = $"Simbir.GO API {apiVersion}",
+                    Description = "ASP NET Core Web API for Simbir.GO"
                 });
         }
     }

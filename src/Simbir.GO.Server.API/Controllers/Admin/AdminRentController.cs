@@ -1,62 +1,75 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Simbir.GO.Server.ApplicationCore.Contracts.Admin.Rents;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Admin;
 
 namespace Simbir.GO.Server.API.Controllers.Admin;
 
 [ApiController]
-[Route("api/v{version:apiVersion}/admin/rent")]
+[Route("api/Admin/Rent")]
 [Authorize(Roles = "Admin")]
-public class AdminRentController: ControllerBase
+public class AdminRentController : ControllerBase
 {
-    // AdminRentController
-    //     GET /api/Admin/Rent/{rentId}
-    // описание: Получение информации по аренде по id
-    // ограничения: Только администраторы
-    // GET /api/Admin/UserHistory/{userId}
-    // описание: Получение истории аренд пользователя с id={userId}
-    // ограничения: Только администраторы
-    // GET /api/Admin/TransportHistory/{transportId}
-    // описание: Получение истории аренд транспорта с id={transportId}
-    // ограничения: Только администраторы
-    // POST /api/Admin/Rent
-    //     описание: Создание новой аренды
-    //     body:
-    // {
-    //     "transportId": long, //id транспортного средства, которое взяли в аренду
-    //     "userId": long, //id аккаунта который будет владеть транспортом на время
-    //     аренды
-    //     "timeStart": "string", //дата и время начала аренды в ISO 8601
-    //     "timeEnd": "string", //дата и время окончания аренды в ISO 8601 (может быть
-    //     null)
-    //     "priceOfUnit": double, //цена единицы вермени аренды (цена за минуту или за
-    //     день)
-    //     "priceType": "string", //тип оплаты [Minutes, Days]
-    //     "finalPrice": 0 //финальная стоимость аренды (может быть null)
-    // }
-    // ограничения: Только администраторы
-    // POST /api/Admin/Rent/End/{rentId}
-    // описание: Завершение аренды транспорта по id аренды
-    // параметры:
-    // lat: double //Географическая широта местонахождения транспорта
-    // long: double //Географическая долгота местонахождения транспорта
-    //     ограничения: Только администраторы
-    // PUT /api/Admin/Rent/{id}
-    // описание: Изменение записи об аренде по id
-    // body:
-    // {
-    //     "transportId": long, //id транспортного средства, которое взяли в аренду
-    //     "userId": long, //id аккаунта который будет владеть транспортом на время
-    //     аренды
-    //     "timeStart": "string", //дата и время начала аренды в ISO 8601
-    //     "timeEnd": "string", //дата и время окончания аренды в ISO 8601 (может быть
-    //     null)
-    //     "priceOfUnit": double, //цена единицы вермени аренды (цена за минуту или за
-    //     день)
-    //     "priceType": "string", //тип оплаты [Minutes, Days]
-    //     "finalPrice": 0 //финальная стоимость аренды (может быть null)
-    // }
-    // ограничения: Только администраторы
-    // DELETE /api/Admin/Rent/{rentId}
-    // описание: Удаление информации об аренде по id
-    // ограничения: Только администраторы
+    private readonly IAdminRentService _rentService;
+
+    public AdminRentController(IAdminRentService rentService)
+    {
+        _rentService = rentService;
+    }
+
+
+    [HttpGet("{rentId:long}")]
+    public async Task<IActionResult> GetById([FromRoute] long rentId)
+    {
+        var result = await _rentService.GetByIdAsync(rentId);
+        return Ok(result);
+    }
+
+    [HttpGet("UserHistory/{userId:long}")]
+    public async Task<IActionResult> GetUserRents([FromRoute] long userId)
+    {
+        var result = await _rentService.GetAccountRentsAsync(userId);
+        return Ok(result);
+    }
+
+
+    [HttpGet("TransportHistory/{transportId:long}")]
+    public async Task<IActionResult> GetTransportRents([FromRoute] long transportId)
+    {
+        var result = await _rentService.GetTransportRentsAsync(transportId);
+        return Ok(result);
+    }
+
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] AdminCreateRentRequest request)
+    {
+        var transport = await _rentService.CreateAsync(request);
+        return Ok(transport);
+    }
+
+
+    [HttpPut("{id:long}")]
+    public async Task<IActionResult> Create([FromQuery] long id, [FromBody] AdminUpdateRentRequest request)
+    {
+        var transport = await _rentService.UpdateAsync(id, request);
+        return Ok(transport);
+    }
+
+
+    [HttpPost("End/{rentId:long}")]
+    [Authorize]
+    public async Task<IActionResult> End([FromRoute] long rentId, [FromQuery] AdminEndRentRequest request)
+    {
+        var result = await _rentService.EndAsync(rentId, request);
+        return Ok(result);
+    }
+
+
+    [HttpDelete("{rentId:long}")]
+    public async Task<IActionResult> Delete([FromRoute] long rentId)
+    {
+        await _rentService.DeleteAsync(rentId);
+        return Ok();
+    }
 }

@@ -1,55 +1,76 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Simbir.GO.Server.ApplicationCore.Contracts.Rents;
+using Simbir.GO.Server.ApplicationCore.Contracts.Transports;
+using Simbir.GO.Server.ApplicationCore.Interfaces;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Authentication;
 
 namespace Simbir.GO.Server.API.Controllers;
 
 [ApiController]
-[Route("api/v{version:apiVersion}/rent")]
+[Route("api/Rent")]
 public class RentController : ControllerBase
 {
-    
-    //Todo search model
-    /*lat: double //Географическая широта центра круга поиска транспорта
-    long: double //Географическая долгота центра круга поиска транспорта
-        radius: double //Радиус круга поиска транспорта
-        type: “string” //Тип транспорта [Car, Bike, Scooter, All]*/
-    [HttpGet]
-    public async Task<IActionResult> Get()
+
+    private readonly IRentService _rentService;
+    private readonly ITransportService _transportService;
+    private readonly IAccountService _accountService;
+    private readonly IAuthenticationService _authenticationService;
+
+    public RentController(IRentService rentService, ITransportService transportService, IAccountService accountService, IAuthenticationService authenticationService)
     {
-        return null;
+        _rentService = rentService;
+        _transportService = transportService;
+        _accountService = accountService;
+        _authenticationService = authenticationService;
     }
     
-    [HttpGet("{rentId:guid}")]
-    //ограничения: Только арендатор и владелец транспорта
-    public async Task<IActionResult> Get([FromRoute] Guid rentId)
+    
+    
+    [HttpGet("Transport")]
+    public async Task<IActionResult> GetByLocation([FromQuery] TransportSearch search)
     {
-        return null;
+        var result = await _transportService.GetListByLocationAsync(search);
+        return Ok(result);
     }
     
-    [HttpGet]
-    //GET /api/Rent/MyHistory
-        /*описание: Получение истории аренд текущего аккаунта
-        ограничения: Только авторизованные пользователи*/
-    public async Task<IActionResult> MyHistory()
+    [HttpGet("{rentId:long}")]
+    [Authorize]
+    public async Task<IActionResult> GetById([FromRoute] long rentId)
     {
-        return null;
+        var result = await _rentService.GetByIdAsync(rentId);
+        return Ok(result);
     }
     
-        
+    [HttpGet("MyHistory")]
+    [Authorize]
+    public async Task<IActionResult> GetAccountRents()
+    {
+        var result = await _rentService.GetAccountRentsAsync();
+        return Ok(result);
+    }
     
-        
-        /*GET /api/Rent/TransportHistory/{transportId}
-    описание: Получение истории аренд транспорта
-    ограничения: Только владелец этого транспорта
-    POST /api/Rent/New/{transportId}
-    описание: Аренда транспорта в личное пользование
-        параметры:
-    rentType: “string” //Тип аренды [Minutes, Days]
-    ограничения: Только авторизованные пользователи, нельзя брать в аренду
-    собственный транспорт
-    POST /api/Rent/End/{rentId}
-    описание: Завершение аренды транспорта по id аренды
-    параметры:
-    lat: double //Географическая широта местонахождения транспорта
-    long: double //Географическая долгота местонахождения транспорта
-        ограничения: Только человек который создавал эту аренду#1#*/
+    [HttpGet("TransportHistory/{transportId:long}")]
+    [Authorize]
+    public async Task<IActionResult> GetTransportRents([FromForm] long transportId)
+    {
+        var result = await _rentService.GetTransportRentsAsync(transportId);
+        return Ok(result);
+    }
+    
+    [HttpPost("New/{transportId:long}")]
+    [Authorize]
+    public async Task<IActionResult> Start([FromRoute] long transportId, [FromQuery] StartRentRequest request)
+    {
+        var result = await _rentService.StartAsync(transportId, request);
+        return Ok(result);
+    }
+    
+    [HttpPost("End/{rentId:long}")]
+    [Authorize]
+    public async Task<IActionResult> End([FromRoute] long rentId, [FromQuery] EndRentRequest request)
+    {
+        var result = await _rentService.EndAsync(rentId, request);
+        return Ok(result);
+    }
 }

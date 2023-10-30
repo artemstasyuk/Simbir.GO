@@ -1,58 +1,60 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Simbir.GO.Server.ApplicationCore.Contracts.Admin.Transports;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Admin;
+using Simbir.GO.Server.ApplicationCore.Specifications.Transports;
 
 namespace Simbir.GO.Server.API.Controllers.Admin;
 
 [ApiController]
-[Route("api/v{version:apiVersion}/admin/transport")]
+[Route("api/Admin/Transport")]
 [Authorize(Roles = "Admin")]
 public class AdminTransportController: ControllerBase
 {
-    /*GET /api/Admin/Transport
-        описание: Получение списка всех транспортных средств
-        параметры:
-    start: int //Начало выборки
-        count: int //Размер выборки
-        transportType: “string” //Тип транспорта [Car, Bike, Scooter, All]
-    ограничения: Только администраторы
-    GET /api/Admin/Transport/{id}
-    описание: Получение информации о транспортном средстве по id
-        ограничения: Только администраторы
-    POST /api/Admin/Transport
-        описание: Создание нового транспортного средства
-    body:
+    private readonly IAdminTransportService _transportService;
+
+    public AdminTransportController(IAdminTransportService transportService)
     {
-        "ownerId": long, //id аккаунта владельца
-        "canBeRented": bool, //Можно ли арендовать транспорт?
-        "transportType": "string", //Тип транспорта [Car, Bike, Scooter]
-        "model": "string", //Модель транспорта
-        "color": "string", //Цвет транспорта
-        "identifier": "string", //Номерной знак
-        "description": "string", //Описание (может быть null)
-        "latitude": double, //Географическая широта местонахождения транспорта
-        "longitude": double, //Географическая долгота местонахождения транспорта
-        "minutePrice": double, //Цена аренды за минуту (может быть null)
-        "dayPrice": double //Цена аренды за сутки (может быть null)
+        _transportService = transportService;
     }
-    ограничения: Только администраторы
-    PUT /api/Admin/Transport/{id}
-    описание: Изменение транспортного средства по id
-        body:
+
+    [HttpGet]
+    public async Task<IActionResult> Get ([FromQuery] TransportFilter filter)
     {
-        "ownerId": long, //id аккаунта владельца
-        "canBeRented": bool, //Можно ли арендовать транспорт?
-        "transportType": "string", //Тип транспорта [Car, Bike, Scooter]
-        "model": "string", //Модель транспорта
-        "color": "string", //Цвет транспорта
-        "identifier": "string", //Номерной знак
-        "description": "string", //Описание (может быть null)
-        "latitude": double, //Географическая широта местонахождения транспорта
-        "longitude": double, //Географическая долгота местонахождения транспорта
-        "minutePrice": double, //Цена аренды за минуту (может быть null)
-        "dayPrice": double //Цена аренды за сутки (может быть null)
+        filter ??= new TransportFilter();
+        var transports = await _transportService.GetByFiltersAsync(filter);
+        return Ok(transports);
     }
-    ограничения: Только администраторы
-    DELETE /api/Admin/Transport/{id}
-    описание: Удаление транспорта по id
-    ограничения: Только администраторы*/
+    
+    
+    [HttpGet("{id:long}")]
+    public async Task<IActionResult> GetById ([FromRoute] long id)
+    {
+        var transport = await _transportService.GetByIdAsync(id);
+        return Ok(transport);
+    }
+    
+    
+    [HttpPost]
+    public async Task<IActionResult> Create ([FromBody] AdminCreateTransportRequest request)
+    {
+        var transport = await _transportService.CreateAsync(request);
+        return Ok(transport);
+    }
+    
+    
+    [HttpPut("{id:long}")]
+    public async Task<IActionResult> Update ([FromRoute] long id, [FromBody] AdminUpdateTransportRequest request)
+    {
+        var transport = await _transportService.UpdateAsync(id, request);
+        return Ok(transport);
+    }
+    
+    
+    [HttpDelete("{id:long}")]
+    public async Task<IActionResult> Delete ([FromRoute] long id)
+    {
+        await _transportService.DeleteAsync(id);
+        return Ok();
+    }
 }

@@ -1,32 +1,53 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Simbir.GO.Server.ApplicationCore.Contracts.Transports;
+using Simbir.GO.Server.ApplicationCore.Interfaces;
 
 namespace Simbir.GO.Server.API.Controllers;
 
 [ApiController]
-[Route("api/v{version:apiVersion}/transport")]
+[Route("api/Transport")]
 public class TransportController : ControllerBase
 {
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+
+    private readonly ITransportService _transportService;
+
+    
+    public TransportController(ITransportService transportService)
     {
-        return null;
+        _transportService = transportService;
     }
     
-    [HttpPost()]
-    public async Task<IActionResult> Create()
+
+    [HttpGet("{id:long}")]
+    public async Task<IActionResult> GetById([FromRoute] long id)
     {
-        return null;
+        var result = await _transportService.GetByIdAsync(id);
+        return Ok(result);
     }
     
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update()
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> Create([FromBody] CreateTransportRequest request)
     {
-        return null;
+        var result = await _transportService.CreateAsync(request);
+
+        return Ok(result);
     }
     
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete()
+    [HttpPut("{id:long}")]
+    [Authorize]
+    public async Task<IActionResult> Update([FromRoute] long id, [FromBody] UpdateTransportRequest request)
     {
-        return null;
+        var result = await _transportService.UpdateAsync(id, request);
+        return Ok(result);
+    }
+    
+    [HttpDelete("{id:long}")]
+    [Authorize]
+    public async Task<IActionResult> Delete([FromRoute] long id)
+    {
+         await _transportService.DeleteAsync(id);
+         return Ok();
     }
 }

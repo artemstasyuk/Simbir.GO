@@ -3,8 +3,9 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Simbir.GO.Server.ApplicationCore.Interfaces;
-using Simbir.GO.Server.Domain;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Authentication;
+using Simbir.GO.Server.ApplicationCore.Interfaces.Helpers;
+using Simbir.GO.Server.Domain.Accounts;
 
 namespace Simbir.GO.Server.Infrastructure.Auth;
 

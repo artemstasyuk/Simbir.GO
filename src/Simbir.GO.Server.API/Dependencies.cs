@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-using Mapster;
-using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace Simbir.GO.Server.API;
 
@@ -10,11 +10,12 @@ public static class Dependencies
 {
     public static IServiceCollection AddPresentation(this IServiceCollection services)
     {
-        services.AddMappings();
-        services.AddSwagger();
-        services.AddApiVersioning();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
+        services.AddSwagger();
+        services.AddApiVersioning();
+       
+        
         return services;
     }
     
@@ -22,14 +23,24 @@ public static class Dependencies
     {
         services.ConfigureOptions<SwaggerOptionsSetup>();
         
-        // Implement auth scheme 
         services.AddSwaggerGen(swagger =>
             {
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 swagger.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+                
+                swagger.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+            
+                swagger.OperationFilter<SecurityRequirementsOperationFilter>();
             }
         );
     }
+    
     
     private static void AddApiVersioning(this IServiceCollection services)
     {
@@ -47,13 +58,9 @@ public static class Dependencies
             options.SubstituteApiVersionInUrl = true;
         });
     }
-    
-    private static void AddMappings(this IServiceCollection services)
-    {
-        var config = TypeAdapterConfig.GlobalSettings;
-        config.Scan(Assembly.GetExecutingAssembly());
 
-        services.AddSingleton(config);
-        services.AddScoped<IMapper, ServiceMapper>();
-    }
+    /*public static void AddHealthChecks(this IServiceCollection services)
+    {
+        services.UseHealthChecks
+    }*/
 }
