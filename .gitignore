@@ -264,5 +264,4 @@ FakesAssemblies/
 
 # Custom files and directories
 .idea/
-iRenta.Server/iRenta.Server.API/Logs
-iRenta.Server/iRenta.Server.API/Media
+iRenta.Server/Simbir.GO/Logs
