@@ -75,26 +75,20 @@ public class AdminRentService : IAdminRentService
         
         if (!Enum.TryParse<PriceType>(request.PriceType, true, out var type))
             throw new IncorrectPriceTypeException();
-
-        var price = type switch
-        {
-            PriceType.Minutes => transport.MinutePrice,
-            PriceType.Days => transport.DayPrice,
-            PriceType.None => throw new InvalidEnumArgumentException(),
-            _ => throw new ArgumentOutOfRangeException()
-        };
-
-        if (price == null)
+        
+        if (!DateTime.TryParse(request.TimeStart, out var timeStart))
             throw new InvalidCredentialsRentException();
         
-        //TODO
+        if (!DateTime.TryParse(request.TimeEnd, out var timeEnd))
+            throw new InvalidCredentialsRentException();
+        
         var rent = Rent.Create(
             transport.Id, 
             account.Id,
             type, 
-            price.Value,
-            DateTime.Parse(request.TimeStart), 
-            DateTime.Parse(request.TimeEnd),
+            request.PriceOfUnit,
+            timeStart,
+            timeEnd,
             request.FinalPrice
         );
 
@@ -113,7 +107,13 @@ public class AdminRentService : IAdminRentService
         
         if (!Enum.TryParse<PriceType>(request.PriceType, true, out var type))
             throw new IncorrectPriceTypeException();
-
+        
+        if (!DateTime.TryParse(request.TimeStart, out var timeStart))
+            throw new InvalidCredentialsRentException();
+        
+        if (!DateTime.TryParse(request.TimeEnd, out var timeEnd))
+            throw new InvalidCredentialsRentException();
+        
         var price = type switch
         {
             PriceType.Minutes => transport.MinutePrice,
@@ -125,14 +125,13 @@ public class AdminRentService : IAdminRentService
         if (price == null)
             throw new InvalidCredentialsRentException();
         
-        //TODO
         rent.Update(
             transport.Id, 
             account.Id,
             type, 
             price.Value,
-            DateTime.Parse(request.TimeStart), 
-            DateTime.Parse(request.TimeEnd),
+            timeStart, 
+            timeEnd,
             request.FinalPrice
         );
 

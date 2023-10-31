@@ -23,7 +23,7 @@ public static class Dependencies
     {
         services
             .AddAuth(configuration)
-            .AddPersistence()
+            .AddPersistence(configuration)
             .AddLogging(configuration, host);
         
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
@@ -59,14 +59,16 @@ public static class Dependencies
         return services;
     }
     
-    private static IServiceCollection AddPersistence(this IServiceCollection services)
+    private static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddPostgres();
+        services.AddPostgres(configuration);
         services.AddScoped(typeof(IRepository<>),typeof(EfRepository<>));
+        
+       
         return services;
     }
     
-    private static void AddLogging(this IServiceCollection services, IConfiguration configuration,
+    private static IServiceCollection AddLogging(this IServiceCollection services, IConfiguration configuration,
         IHostBuilder host)
     {
         var logger = new LoggerConfiguration()
@@ -74,5 +76,7 @@ public static class Dependencies
             .CreateLogger();
 
         host.UseSerilog(logger);
+
+        return services;
     }
 }

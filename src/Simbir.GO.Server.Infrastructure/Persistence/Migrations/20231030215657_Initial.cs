@@ -1,6 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using Simbir.GO.Server.Domain.Accounts.Enums;
+using Simbir.GO.Server.Domain.Rents.Enums;
+using Simbir.GO.Server.Domain.Transports.Enums;
 
 #nullable disable
 
@@ -12,6 +15,11 @@ namespace Simbir.GO.Server.Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:Enum:price_type", "none,minutes,days")
+                .Annotation("Npgsql:Enum:role", "none,customer,admin")
+                .Annotation("Npgsql:Enum:transport_type", "none,car,bike,scooter");
+
             migrationBuilder.CreateTable(
                 name: "accounts",
                 columns: table => new
@@ -21,7 +29,7 @@ namespace Simbir.GO.Server.Infrastructure.Persistence.Migrations
                     username = table.Column<string>(type: "text", nullable: false),
                     passwordHash = table.Column<string>(type: "text", nullable: false),
                     passwordSalt = table.Column<string>(type: "text", nullable: false),
-                    role = table.Column<string>(type: "text", nullable: false),
+                    role = table.Column<Role>(type: "role", nullable: false),
                     balance = table.Column<double>(type: "double precision", nullable: false),
                     createdDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updatedDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -41,13 +49,13 @@ namespace Simbir.GO.Server.Infrastructure.Persistence.Migrations
                     model = table.Column<string>(type: "text", nullable: false),
                     color = table.Column<string>(type: "text", nullable: false),
                     identifier = table.Column<string>(type: "text", nullable: false),
-                    description = table.Column<string>(type: "text", nullable: false),
+                    description = table.Column<string>(type: "text", nullable: true),
                     location_Latitude = table.Column<double>(type: "double precision", nullable: false),
                     location_Longitude = table.Column<double>(type: "double precision", nullable: false),
-                    minutePrice = table.Column<double>(type: "double precision", nullable: false),
-                    dayPrice = table.Column<double>(type: "double precision", nullable: false),
+                    minutePrice = table.Column<double>(type: "double precision", nullable: true),
+                    dayPrice = table.Column<double>(type: "double precision", nullable: true),
                     canBeRented = table.Column<bool>(type: "boolean", nullable: false),
-                    transportType = table.Column<string>(type: "text", nullable: false)
+                    transportType = table.Column<TransportType>(type: "transport_type", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,11 +76,11 @@ namespace Simbir.GO.Server.Infrastructure.Persistence.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     transportId = table.Column<long>(type: "bigint", nullable: false),
                     accountId = table.Column<long>(type: "bigint", nullable: false),
-                    rentType = table.Column<string>(type: "text", nullable: false),
+                    priceType = table.Column<PriceType>(type: "price_type", nullable: false),
                     timeStart = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    timeEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    timeEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     priceOfUnit = table.Column<double>(type: "double precision", nullable: false),
-                    finalPrice = table.Column<double>(type: "double precision", nullable: false)
+                    finalPrice = table.Column<double>(type: "double precision", nullable: true)
                 },
                 constraints: table =>
                 {

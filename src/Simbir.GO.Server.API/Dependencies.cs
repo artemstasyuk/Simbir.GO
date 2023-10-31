@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi.Models;
@@ -14,6 +16,7 @@ public static class Dependencies
         services.AddEndpointsApiExplorer();
         services.AddSwagger();
         services.AddApiVersioning();
+        services.AddMappings();
        
         
         return services;
@@ -57,6 +60,16 @@ public static class Dependencies
             options.GroupNameFormat = "'v'VVV";
             options.SubstituteApiVersionInUrl = true;
         });
+    }
+    
+    private static IServiceCollection AddMappings(this IServiceCollection services)
+    {
+        var config = TypeAdapterConfig.GlobalSettings;
+        config.Scan(Assembly.GetExecutingAssembly());
+
+        services.AddSingleton(config);
+        services.AddScoped<IMapper, ServiceMapper>();
+        return services;
     }
 
     /*public static void AddHealthChecks(this IServiceCollection services)

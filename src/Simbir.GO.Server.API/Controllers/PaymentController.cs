@@ -18,12 +18,10 @@ public class PaymentController : ControllerBase
 
     [HttpPost("Hesoyam/{accountId:long}")]
     [Authorize]
-    public async Task<IActionResult> AddBalance([FromRoute] long accountId)
+    public async Task<IActionResult> AddBalance(long accountId)
     {
         if (User.IsInRole("Admin"))
              await _paymentService.UpdateBalanceAsync(accountId);
-
-        await _paymentService.AddBalance();
 
         return Ok();
     }

@@ -6,10 +6,10 @@ namespace Simbir.GO.Server.ApplicationCore.Interfaces;
 public interface IRentService
 {
     Task<Rent> GetByIdAsync(long id);
+
+    Task<Rent> StartAsync(long transportId, StartRentParams @params);
     
-    Task<Rent> StartAsync(long transportId, StartRentRequest request);
-    
-    Task<Rent> EndAsync(long rentId, EndRentRequest request);
+    Task<Rent> EndAsync(long rentId, EndRentParams @params);
 
     Task<List<Rent>> GetAccountRentsAsync();
 

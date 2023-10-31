@@ -1,6 +1,8 @@
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Simbir.GO.Server.ApplicationCore.Contracts.Admin.Rents;
+using Simbir.GO.Server.ApplicationCore.Contracts.Rents;
 using Simbir.GO.Server.ApplicationCore.Interfaces.Admin;
 
 namespace Simbir.GO.Server.API.Controllers.Admin;
@@ -11,63 +13,64 @@ namespace Simbir.GO.Server.API.Controllers.Admin;
 public class AdminRentController : ControllerBase
 {
     private readonly IAdminRentService _rentService;
+    private readonly IMapper _mapper;
 
-    public AdminRentController(IAdminRentService rentService)
+    public AdminRentController(IAdminRentService rentService, IMapper mapper)
     {
         _rentService = rentService;
+        _mapper = mapper;
     }
 
 
     [HttpGet("{rentId:long}")]
-    public async Task<IActionResult> GetById([FromRoute] long rentId)
+    public async Task<IActionResult> GetById(long rentId)
     {
         var result = await _rentService.GetByIdAsync(rentId);
-        return Ok(result);
+        return Ok(_mapper.Map<RentResult>(result));
     }
 
     [HttpGet("UserHistory/{userId:long}")]
-    public async Task<IActionResult> GetUserRents([FromRoute] long userId)
+    public async Task<IActionResult> GetUserRents(long userId)
     {
         var result = await _rentService.GetAccountRentsAsync(userId);
-        return Ok(result);
+        return Ok(_mapper.Map<List<RentResult>>(result));
     }
 
 
     [HttpGet("TransportHistory/{transportId:long}")]
-    public async Task<IActionResult> GetTransportRents([FromRoute] long transportId)
+    public async Task<IActionResult> GetTransportRents(long transportId)
     {
         var result = await _rentService.GetTransportRentsAsync(transportId);
-        return Ok(result);
+        return Ok(_mapper.Map<List<RentResult>>(result));
     }
 
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] AdminCreateRentRequest request)
     {
-        var transport = await _rentService.CreateAsync(request);
-        return Ok(transport);
+        var result = await _rentService.CreateAsync(request);
+        return Ok(_mapper.Map<RentResult>(result));
     }
 
 
     [HttpPut("{id:long}")]
-    public async Task<IActionResult> Create([FromQuery] long id, [FromBody] AdminUpdateRentRequest request)
+    public async Task<IActionResult> Create(long id, [FromBody] AdminUpdateRentRequest request)
     {
-        var transport = await _rentService.UpdateAsync(id, request);
-        return Ok(transport);
+        var result = await _rentService.UpdateAsync(id, request);
+        return Ok(_mapper.Map<RentResult>(result));
     }
 
 
     [HttpPost("End/{rentId:long}")]
-    [Authorize]
-    public async Task<IActionResult> End([FromRoute] long rentId, [FromQuery] AdminEndRentRequest request)
+    public async Task<IActionResult> End(long rentId, [FromQuery] AdminEndRentRequest request)
     {
         var result = await _rentService.EndAsync(rentId, request);
-        return Ok(result);
+        return Ok(_mapper.Map<RentResult>(result));
     }
 
 
     [HttpDelete("{rentId:long}")]
-    public async Task<IActionResult> Delete([FromRoute] long rentId)
+    public async Task<IActionResult> Delete(long rentId)
     {
         await _rentService.DeleteAsync(rentId);
         return Ok();

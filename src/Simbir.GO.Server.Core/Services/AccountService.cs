@@ -29,7 +29,7 @@ public class AccountService : IAccountService
 
         return account;
     }
-    
+
     public async Task<Account> EditAsync(EditAccountRequest request)
     {
         var account = await _authenticationService.GetCurrentUserAsync();

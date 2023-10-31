@@ -11,6 +11,9 @@ builder.Services
     .AddInfrastructure(builder.Configuration, builder.Host)
     .AddPresentation();
 
+// Add seeding
+await builder.Services.AddSeed();
+
 
 var app = builder.Build();
 

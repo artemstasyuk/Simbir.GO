@@ -42,13 +42,13 @@ public class RentService : IRentService
 
     }
 
-    public async Task<Rent> StartAsync(long transportId, StartRentRequest request)
+    public async Task<Rent> StartAsync(long transportId, StartRentParams @params)
     {
         var account = await _authenticationService.GetCurrentUserAsync();
         
         var transport = await _transportService.GetByIdAsync(transportId);
         
-        if (!Enum.TryParse<PriceType>(request.PriceType, true, out var type))
+        if (!Enum.TryParse<PriceType>(@params.PriceType, true, out var type))
             throw new IncorrectPriceTypeException();
         
         if (account.Id == transport.TransportOwnerId)
@@ -75,7 +75,7 @@ public class RentService : IRentService
     public async Task<List<Rent>> GetAccountRentsAsync()
     {
         var account = await _authenticationService.GetCurrentUserAsync();
-
+        
         var rents = await _rentRepository.ListAsync(new RentsByAccountSpec(account.Id));
 
         return rents;
@@ -88,7 +88,7 @@ public class RentService : IRentService
         return rents;
     }
 
-    public async Task<Rent> EndAsync(long rentId, EndRentRequest request)
+    public async Task<Rent> EndAsync(long rentId, EndRentParams @params)
     {
         var account = await _authenticationService.GetCurrentUserAsync();
         
@@ -100,7 +100,7 @@ public class RentService : IRentService
             throw new InvalidCredentialsRentException();
         
         rent.End();
-        transport.Location.Update(request.Latitude, request.Longitude);
+        transport.Location.Update(@params.Latitude, @params.Longitude);
         
         await _rentRepository.UpdateAsync(rent);
 

@@ -41,10 +41,8 @@ public class AdminAccountService : IAdminAccountService
     {
         if (await _accountRepository.FirstOrDefaultAsync(new AccountByUsernameSpec(request.Username)) is not null)
             throw new DuplicateUsernameAccountException();
-
-        var role = Role.Customer;
-        if (request.IsAdmin)
-            role = Role.Admin;
+        
+        var role = request.IsAdmin ? Role.Admin : Role.Customer;
         
         var salt = Encryption.CreateSaltKey(SecurityConstants.PasswordSaltKeySize);
         var passwordHash = Encryption.CreatePasswordHash(request.Password, salt, SecurityConstants.DefaultHashedPasswordFormat);
@@ -64,9 +62,7 @@ public class AdminAccountService : IAdminAccountService
         if (await _accountRepository.FirstOrDefaultAsync(new AccountByUsernameSpec(request.Username)) is not null)
             throw new DuplicateUsernameAccountException();
         
-        var role = Role.Customer;
-        if (request.IsAdmin)
-            role = Role.Admin;
+        var role = request.IsAdmin ? Role.Admin : Role.Customer;
         
         var salt = Encryption.CreateSaltKey(SecurityConstants.PasswordSaltKeySize);
         var passwordHash = Encryption.CreatePasswordHash(request.Password, salt, SecurityConstants.DefaultHashedPasswordFormat);

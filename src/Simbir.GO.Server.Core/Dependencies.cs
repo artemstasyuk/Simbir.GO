@@ -12,6 +12,9 @@ public static class Dependencies
 {
     public static IServiceCollection AddApplicationCore(this IServiceCollection services)
     {
+        services
+            .AddAdmin();
+        
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IPaymentService, PaymentService>();
@@ -24,7 +27,7 @@ public static class Dependencies
     public static IServiceCollection AddAdmin(this IServiceCollection services)
     {
         services.AddScoped<IAdminAccountService, AdminAccountService>();
-        services.AddScoped<IAdminRentService, IAdminRentService>();
+        services.AddScoped<IAdminRentService, AdminRentService>();
         services.AddScoped<IAdminTransportService,  AdminTransportService>();
 
         return services;

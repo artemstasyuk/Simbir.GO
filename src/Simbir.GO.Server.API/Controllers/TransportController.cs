@@ -1,3 +1,4 @@
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Simbir.GO.Server.ApplicationCore.Contracts.Transports;
@@ -11,11 +12,13 @@ public class TransportController : ControllerBase
 {
 
     private readonly ITransportService _transportService;
+    private readonly IMapper _mapper;
 
     
-    public TransportController(ITransportService transportService)
+    public TransportController(ITransportService transportService, IMapper mapper)
     {
         _transportService = transportService;
+        _mapper = mapper;
     }
     
 
@@ -23,7 +26,7 @@ public class TransportController : ControllerBase
     public async Task<IActionResult> GetById([FromRoute] long id)
     {
         var result = await _transportService.GetByIdAsync(id);
-        return Ok(result);
+        return Ok(_mapper.Map<TransportResult>(result));
     }
     
     [HttpPost]
@@ -31,8 +34,7 @@ public class TransportController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateTransportRequest request)
     {
         var result = await _transportService.CreateAsync(request);
-
-        return Ok(result);
+        return Ok(_mapper.Map<TransportResult>(result));
     }
     
     [HttpPut("{id:long}")]
@@ -40,7 +42,7 @@ public class TransportController : ControllerBase
     public async Task<IActionResult> Update([FromRoute] long id, [FromBody] UpdateTransportRequest request)
     {
         var result = await _transportService.UpdateAsync(id, request);
-        return Ok(result);
+        return Ok(_mapper.Map<TransportResult>(result));
     }
     
     [HttpDelete("{id:long}")]

@@ -54,7 +54,7 @@ public sealed class Account : AggregateRoot
     /// <summary>
     /// Read only list of accounts rents
     /// </summary>
-    public IReadOnlyList<Transport> AccountTransport { get; set; }
+    public IReadOnlyList<Transport> AccountTransports { get; set; }
     
     /// <summary>
     /// Ctor

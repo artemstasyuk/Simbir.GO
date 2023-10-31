@@ -13,14 +13,15 @@ public sealed class TransportSpec: Specification<Transport>
         Query.OrderBy(x => x.Id);
 
         if (filter.LoadChildren)
-            Query.Include(x => x.TransportRents)
-                .Include(x => x.Account);
-        
-        if (!Enum.TryParse<TransportType>(filter.TransportType, true, out var type))
-            throw new IncorrectTransportTypeException();
+            Query.Include(x => x.TransportRents);
 
-        if (String.IsNullOrEmpty(filter.TransportType))
+        
+        if (!string.IsNullOrEmpty(filter.TransportType))
+        {
+            if (!Enum.TryParse<TransportType>(filter.TransportType, true, out var type))
+                throw new IncorrectTransportTypeException();
             Query.Where(x => x.TransportType == type);
+        }
         
         if (filter.IsPagingEnabled)
         {

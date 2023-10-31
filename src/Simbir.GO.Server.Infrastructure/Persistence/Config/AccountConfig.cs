@@ -1,15 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Simbir.GO.Server.Domain.Accounts;
-using Simbir.GO.Server.Domain.Accounts.Enums;
-using Simbir.GO.Server.Infrastructure.Persistence.Database;
 
 namespace Simbir.GO.Server.Infrastructure.Persistence.Config;
 
 public class AccountConfig : IEntityTypeConfiguration<Account>
 {
-    private readonly List<Account> _accounts = SeedData.CreateUsers();
-    
     public void Configure(EntityTypeBuilder<Account> builder)
     {
         builder.ToTable("accounts");
@@ -23,7 +19,7 @@ public class AccountConfig : IEntityTypeConfiguration<Account>
             .WithOne(x => x.Account)
             .HasForeignKey(x => x.AccountId);
 
-        builder.HasMany(x => x.AccountTransport)
+        builder.HasMany(x => x.AccountTransports)
             .WithOne(x => x.Account)
             .HasForeignKey(x => x.TransportOwnerId);
 
@@ -47,13 +43,6 @@ public class AccountConfig : IEntityTypeConfiguration<Account>
         
         builder.Property(p => p.UpdatedDateTime)
             .IsRequired();
-        
-        builder.Property(p => p.Role).IsRequired()
-            .HasConversion(
-                p => p.ToString(),
-                p => (Role)Enum.Parse(typeof(Role), p));
-        
-       //TODO builder.HasData(_accounts);
         
     }
 }
