@@ -5,6 +5,7 @@
 - [Задание](#задание)
   - [Требования](#требования)
 - [Технологии](#технологии)
+  - [Данные](#данные)
   - [Как запустить](#запуск)
  
   
@@ -40,7 +41,7 @@
 
 
 ## Запуск
-1. Поменяйте строку подключения к бд
+1. Поменяйте строку подключения к бд. конфиг находится в appsetting.json в проекте Simbir.GO.API
 ```json
  "ConnectionStrings": {
     "Postgres": "Host=localhost;Port=5432;Database=Simbir.GO;Username={your-name};Password={your-password}"
