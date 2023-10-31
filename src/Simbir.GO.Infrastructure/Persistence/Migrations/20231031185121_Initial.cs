@@ -39,10 +39,9 @@ namespace Simbir.GO.Infrastructure.Persistence.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     token = table.Column<string>(type: "text", nullable: false),
                     jwt_id = table.Column<string>(type: "text", nullable: false),
-                    user_id = table.Column<long>(type: "bigint", nullable: false),
+                    account_id = table.Column<long>(type: "bigint", nullable: false),
                     is_revoked = table.Column<bool>(type: "boolean", nullable: false),
                     created_date_time = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    account_id = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {

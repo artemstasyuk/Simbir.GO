@@ -1,4 +1,4 @@
-# Задания для олемпиады Volga IT.
+# Задания для олимпиады Volga IT.
 
 ## Содержание
 
@@ -26,10 +26,10 @@
 
 * [ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core)
 * [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/)
-* [Mapster](https://automapper.org/)
+* [Mapster](https://github.com/MapsterMapper/Mapster)
 * [ArdalisSpecification](https://specification.ardalis.com/)
-* [Serilog](https://automapper.org/)
-* [PostgreSQL]([https://automapper.org/](https://serilog.net/))
+* [Serilog](https://serilog.net/)
+* [PostgreSQL](https://www.postgresql.org/)
   
 
 #### Запуск

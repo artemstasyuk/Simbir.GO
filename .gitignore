@@ -264,4 +264,4 @@ FakesAssemblies/
 
 # Custom files and directories
 .idea/
-iRenta.Server/Simbir.GO/Logs
+src/Simbir.GO.API/Logs

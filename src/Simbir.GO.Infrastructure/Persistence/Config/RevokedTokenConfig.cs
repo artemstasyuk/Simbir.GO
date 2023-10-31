@@ -20,7 +20,7 @@ public class RevokedTokenConfig : IEntityTypeConfiguration<RevokedToken>
         builder.Property(p => p.JwtId)
             .IsRequired();
         
-        builder.Property(p => p.UserId)
+        builder.Property(p => p.AccountId)
             .IsRequired();
         
         builder.Property(p => p.IsRevoked)
