@@ -1,7 +1,5 @@
 # Задания для олемпиады Volga IT.
 
-# Simbir.GO Transport rent web api
-
 ## Содержание
 
 - [Задание](#задание)
