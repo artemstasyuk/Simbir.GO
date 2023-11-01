@@ -48,6 +48,9 @@
   },
 ```
 2.  Запустите проект
+3.  Swagger Url
+   http - [http://localhost:5085/swagger/index.html](http://localhost:5085/swagger/index.html)
+   https - [http://localhost:7238/swagger/index.html](https://localhost:7238/swagger/index.html)
 
 
 
